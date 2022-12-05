@@ -24,14 +24,22 @@
           <div class="block-wrapper__block">
             <div v-for="(i, idx) in wordsNum" :key="i">
               <div class="word-number" :data-number="idx + 1">
-                <WordConverter :words="wordsMap" :find-word="true" />
+                <WordConverter
+                  :words="wordsMap"
+                  :find-word="true"
+                  :suggestions="suggestions"
+                />
               </div>
             </div>
           </div>
           <div class="block-wrapper__block">
             <div v-for="(i, idx) in wordsNum" :key="i">
               <div class="word-number" :data-number="idx + 13">
-                <WordConverter :words="wordsMap" :find-word="true" />
+                <WordConverter
+                  :words="wordsMap"
+                  :find-word="true"
+                  :suggestions="suggestions"
+                />
               </div>
             </div>
           </div>
@@ -82,6 +90,8 @@ const wordsMapFiltered = computed(() => {
   );
   return Object.fromEntries(filtered);
 });
+
+const suggestions = ref(Object.keys(wordsMap).map((word) => word));
 </script>
 
 <style scoped lang="scss">

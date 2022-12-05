@@ -1,14 +1,29 @@
 <template>
   <div class="word-info">
+    <AutoComplete
+      v-if="findWord"
+      v-model="searchField"
+      placeholder="Type word"
+      :dropdown="true"
+      :suggestions="filteredWords"
+      :class="{ 'result-found': wordsMapFiltered[0] }"
+      @complete="search($event)"
+      @blur="updateStatus = !!searchField"
+    />
     <InputText
+      v-else
       v-model="searchField"
       type="text"
-      :placeholder="placeholder"
+      placeholder="Type number"
       :class="{ 'result-found': wordsMapFiltered[0] }"
+      @blur="updateStatus = !!searchField"
     />
     <div
       class="word-info__result"
-      :class="{ 'result-found': wordsMapFiltered[0] }"
+      :class="{
+        'result-found': wordsMapFiltered[0],
+        'result-not-found': !wordsMapFiltered[0] && searchField && updateStatus,
+      }"
     >
       {{ wordsMapFiltered[0] }}
     </div>
@@ -21,14 +36,27 @@ import { ref, computed } from "vue";
 interface Props {
   words: Record<string, string>;
   findWord: boolean;
+  suggestions?: Array<string>;
 }
 
-const props = defineProps<Props>();
+const props = withDefaults(defineProps<Props>(), {
+  suggestions: () => [],
+});
 
 const searchField = ref("");
+const updateStatus = ref(false);
+
+const search = ({ query }: { query: string }) => {
+  if (!query.trim()) {
+    filteredWords.value = [...props.suggestions];
+    return;
+  }
+  filteredWords.value = props.suggestions.filter((f) => f.startsWith(query));
+};
 
 const idxMap = props.findWord ? 1 : 0;
-const placeholder = props.findWord ? "Type word" : "Type number";
+
+const filteredWords = ref<Array<string>>([...props.suggestions]);
 
 const wordsMapFiltered = computed(() => {
   const wordsEntries = Object.entries(props.words);
@@ -63,6 +91,26 @@ const wordsMapFiltered = computed(() => {
 }
 
 .result-found {
-  background-color: green !important;
+  background-color: var(--green) !important;
+  color: black !important;
+
+  input {
+    background-color: var(--green) !important;
+    color: black !important;
+  }
+}
+
+.result-not-found {
+  background-color: orange !important;
+}
+
+.p-autocomplete {
+  border-radius: 10px;
+  .p-button {
+    background-color: black;
+    &:focus {
+      box-shadow: none;
+    }
+  }
 }
 </style>

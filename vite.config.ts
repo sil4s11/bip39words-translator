@@ -11,6 +11,8 @@ export default defineConfig({
     vue(),
     VitePWA({
       manifest: {
+        name: "BIP39 Word Translator",
+        short_name: "BIP39 Word Translator",
         display: "standalone",
         scope: "./",
         start_url: "./",

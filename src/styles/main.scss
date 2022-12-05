@@ -1,5 +1,6 @@
 :root {
-  --bg-color: #2b2b2b
+  --bg-color: #2b2b2b;
+  --green: #61F286;
 }
 
 body {
@@ -46,20 +47,31 @@ body {
   }
 
   .p-highlight .p-tabview-nav-link {
-    color: greenyellow !important;
-    border-color: greenyellow !important;
+    color: var(--green) !important;
+    border-color: var(--green) !important;
   }
 }
 
 .p-inputtext {
-  color: whitesmoke !important;
+  color: whitesmoke;
   font-weight: bold;
   background-color: #414141;
 
   &:focus {
-    background-color: #dbff9d;
+    background-color: #4F46E5;
     box-shadow: none !important;
-    color: black !important;
+  }
+}
+
+.p-autocomplete-panel {
+  background-color: black;
+
+  .p-autocomplete-item {
+    color: white !important;
+
+    &:hover, &.p-focus {
+      background-color: #4F46E5 !important;
+    }
   }
 }
 
