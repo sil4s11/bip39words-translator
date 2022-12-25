@@ -19,6 +19,7 @@
       @blur="updateStatus = !!searchField"
     />
     <div
+      v-if="showNumber"
       class="word-info__result"
       :class="{
         'result-found': wordsMapFiltered[0],
@@ -31,20 +32,25 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from "vue";
+import { ref, computed, watchEffect } from "vue";
 
 interface Props {
   words: Record<string, string>;
   findWord: boolean;
   suggestions?: Array<string>;
+  showNumber?: boolean;
+  word?: string;
 }
 
 const props = withDefaults(defineProps<Props>(), {
   suggestions: () => [],
+  showNumber: true,
 });
 
 const searchField = ref("");
 const updateStatus = ref(false);
+
+watchEffect(() => (searchField.value = props.word || ""));
 
 const search = ({ query }: { query: string }) => {
   if (!query.trim()) {
@@ -107,7 +113,10 @@ const wordsMapFiltered = computed(() => {
 .p-autocomplete {
   border-radius: 10px;
   .p-button {
-    background-color: black;
+    // background-color: black;
+    background: #333333;
+    color: white;
+    border: none;
     &:focus {
       box-shadow: none;
     }
