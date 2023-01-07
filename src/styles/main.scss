@@ -21,8 +21,11 @@ body {
   max-width: 1280px;
   margin: 0 auto;
   padding: 2rem;
-
   font-weight: normal;
+
+  @media (max-width: 520px) {
+    padding: 1rem;
+  }
 }
 
 .p-tabview-panels {
@@ -33,7 +36,6 @@ body {
 .p-tabview {
   .p-tabview-nav {
     background-color: var(--bg-color);
-    justify-content: space-around;
     li {
       flex: 1;
     }
@@ -47,8 +49,8 @@ body {
   }
 
   .p-highlight .p-tabview-nav-link {
-    color: var(--green) !important;
-    border-color: var(--green) !important;
+    color: var(--primary-color) !important;
+    border-color: var(--primary-color) !important;
   }
 }
 
@@ -58,7 +60,7 @@ body {
   background-color: #414141;
 
   &:focus {
-    background-color: #4F46E5;
+    background: var(--surface-50);
     box-shadow: none !important;
   }
 }
@@ -76,14 +78,10 @@ body {
 }
 
 .p-autocomplete-panel {
-  // background-color: black;
+  background: var(--surface-50) !important;
 
   .p-autocomplete-item {
     color: white !important;
-
-    &:hover, &.p-focus {
-      background-color: #4F46E5 !important;
-    }
   }
 }
 

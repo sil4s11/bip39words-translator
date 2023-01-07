@@ -15,7 +15,11 @@
       v-model="searchField"
       type="text"
       placeholder="Type number"
-      :class="{ 'result-found': wordsMapFiltered[0] }"
+      :class="{
+        'result-found': wordsMapFiltered[0],
+        'result-not-found': !wordsMapFiltered[0] && searchField && updateStatus,
+      }"
+      :maxlength="findWord ? 30 : 4"
       @blur="updateStatus = !!searchField"
     />
     <div
@@ -67,9 +71,11 @@ const filteredWords = ref<Array<string>>([...props.suggestions]);
 const wordsMapFiltered = computed(() => {
   const wordsEntries = Object.entries(props.words);
   const filtered = wordsEntries
-    .filter(([word, number]) =>
-      props.findWord ? word === searchField.value : number === searchField.value
-    )
+    .filter(([word, number]) => {
+      return props.findWord
+        ? word === searchField.value
+        : number === searchField.value;
+    })
     .map((entry) => entry[idxMap]);
 
   return filtered;
@@ -97,23 +103,23 @@ const wordsMapFiltered = computed(() => {
 }
 
 .result-found {
-  background-color: var(--green) !important;
+  background-color: var(--green-300) !important;
   color: black !important;
 
   input {
-    background-color: var(--green) !important;
+    background-color: var(--green-300) !important;
     color: black !important;
   }
 }
 
 .result-not-found {
-  background-color: orange !important;
+  color: black !important;
+  background-color: var(--orange-300) !important;
 }
 
 .p-autocomplete {
   border-radius: 10px;
   .p-button {
-    // background-color: black;
     background: #333333;
     color: white;
     border: none;

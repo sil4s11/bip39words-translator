@@ -3,7 +3,8 @@
     <h1 class="header">BIP39 Word finder</h1>
   </header>
   <main>
-    <TabView>
+    <TabView v-model:activeIndex="activeTab">
+      <!-- Finder -->
       <TabPanel header="Word finder">
         <div class="finder-wrapper">
           <InputText type="text" v-model="searchField" />
@@ -16,12 +17,20 @@
               <span>{{ number }}</span>
               <span>{{ word }}</span>
             </div>
+            <span v-if="!Object.keys(wordsMapFiltered).length">
+              No words found
+            </span>
           </div>
         </div>
       </TabPanel>
+      <!-- Word to number -->
       <TabPanel header="Seed (word to number)">
         <div class="flex justify-content-center mb-2">
-          <SelectButton v-model.number="wordsNum" :options="[12, 24]" />
+          <SelectButton
+            v-model.number="wordsNum"
+            :options="[12, 24]"
+            :unselectable="false"
+          />
         </div>
         <div class="block-wrapper">
           <div class="block-wrapper__block">
@@ -50,9 +59,14 @@
           </div>
         </div>
       </TabPanel>
+      <!-- Number to word -->
       <TabPanel header="Seed (number to word)">
         <div class="flex justify-content-center mb-2">
-          <SelectButton v-model.number="wordsNum" :options="[12, 24]" />
+          <SelectButton
+            v-model.number="wordsNum"
+            :options="[12, 24]"
+            :unselectable="false"
+          />
         </div>
         <div class="block-wrapper">
           <div class="block-wrapper__block">
@@ -71,19 +85,44 @@
           </div>
         </div>
       </TabPanel>
+      <!-- Shares tab -->
       <TabPanel header="Shares">
+        <!-- // Generate shares -->
+        <div class="flex justify-content-center mb-2 gap-3">
+          <SelectButton
+            v-model="optionShare"
+            :options="optionsShares"
+            :unselectable="false"
+          />
+          <SelectButton
+            v-model.number="numShares"
+            :options="options"
+            :unselectable="false"
+            @change="updateRecoverShares"
+          />
+          <SelectButton
+            v-if="optionShare === 'Generate'"
+            v-model.number="wordsNum"
+            :options="[12, 24]"
+            :unselectable="false"
+          />
+        </div>
         <div class="flex gap-3">
-          <div class="flex-1">
+          <div v-if="optionShare === 'Generate'" class="flex-1 share-option">
             <div class="title">Seed to shares</div>
-            <TextareaField v-model="seed" class="seed-box" :autoResize="true" />
+            <TextareaField
+              v-model.trim="seed"
+              class="seed-box"
+              :autoResize="true"
+              @change="validateWords(seed)"
+            />
             <div
               class="mt-2 flex align-items-center justify-content-center gap-4"
             >
-              <h5 id="single">Shares</h5>
-              <SelectButton v-model.number="numShares" :options="options" />
               <PrimeButton
                 label="Generate"
                 class="p-button-outlined p-button-success"
+                :disabled="invalidSeedShare"
                 @click="generateShares"
               />
             </div>
@@ -98,53 +137,84 @@
                 class="shares-wrapper__share"
               >
                 {{ share }}
-                <i class="pi pi-check" @click="setWordsToConvert(share)"></i>
+                <i
+                  class="ml-1 pi pi-file-import shares-wrapper__share__icon"
+                  v-tooltip.top="'Convert to number'"
+                  @click="setWordsToConvert(share)"
+                ></i>
               </div>
             </div>
           </div>
 
-          <div class="flex-1">
+          <!-- Recover seed -->
+          <div v-if="optionShare === 'Recover'" class="flex-1 share-option">
             <div class="title">Shares to seed</div>
-            <TextareaField
-              v-model="recoverShares[0]"
-              class="seed-box"
-              :autoResize="true"
-              @change="recoverSeed"
-            />
-            <TextareaField
-              v-model="recoverShares[1]"
-              class="seed-box"
-              :autoResize="true"
-              @change="recoverSeed"
-            />
-            <div>{{ recoveredSeed }}</div>
+            <div
+              v-for="(_, idx) in recoverShares"
+              :key="idx"
+              class="share-wrapper"
+            >
+              <InputText
+                v-model="recoverShares[idx].number"
+                type="number"
+                placeholder="Type number"
+                :min="1"
+                :max="numShares"
+              />
+              <TextareaField
+                v-model.trim="recoverShares[idx].value"
+                class="seed-box"
+                :autoResize="true"
+              />
+            </div>
+            <div
+              class="mt-2 flex align-items-center justify-content-center gap-4"
+            >
+              <PrimeButton
+                label="Recover"
+                class="p-button-outlined p-button-success"
+                :disabled="!isValidShares"
+                @click="recoverSeed"
+              />
+            </div>
+            <div v-if="recoveredSeed">
+              <div class="title">Seed</div>
+              <div class="recoveredSeed">{{ recoveredSeed }}</div>
+            </div>
           </div>
         </div>
       </TabPanel>
     </TabView>
+    <PrimeToast position="bottom-right" />
   </main>
 </template>
 
 <script setup lang="ts">
-import { computed, ref, onMounted } from "vue";
-import { words } from "@/lib/index";
+import { computed, ref } from "vue";
 import WordConverter from "@/components/WordConverter.vue";
+import { words } from "@/lib/index";
 import { splitMnemonic, recoverMnemonic } from "shamir-bip39";
+import { useToast } from "primevue/usetoast";
 
-onMounted(() => {
-  seed.value =
-    "jelly better achieve collect unaware mountain thought cargo oxygen act hood bridge";
-  // generateShares();
-});
+const toast = useToast();
+
+const activeTab = ref(0);
 
 const wordsNum = ref(12);
 const searchField = ref("");
 const seed = ref("");
-const recoverShares = ref(["", ""]);
+const recoverShares = ref([
+  { number: "1", value: "" },
+  { number: "2", value: "" },
+]);
 const recoveredSeed = ref("");
+const invalidSeedShare = ref(true);
 
 const numShares = ref(3);
 const options = ref([3, 5]);
+
+const optionShare = ref("Generate");
+const optionsShares = ["Generate", "Recover"];
 
 const shares = ref<string[]>([]);
 const shareToConvert = ref<string[]>([]);
@@ -176,24 +246,90 @@ const generateShares = () => {
     );
     shares.value = Object.values(newShares).map((val) => val);
   } catch (error) {
-    console.log(error);
+    toast.add({
+      severity: "warn",
+      summary: "Invalid mnemonic",
+      detail: `That combination is not correct, please check the seed`,
+      life: 3000,
+    });
+  }
+};
+const updateRecoverShares = () => {
+  if (numShares.value === 3) {
+    recoverShares.value.pop();
+  } else if (numShares.value === 5) {
+    recoverShares.value.push({ number: "3", value: "" });
   }
 };
 
 const setWordsToConvert = (share: string) => {
-  // debugger;
   shareToConvert.value = share.split(" ");
+  activeTab.value = 1;
 };
 
+const validateWords = (wordsString: string) => {
+  const wordsArray = wordsString.split(" ");
+  const isValid = wordsArray.every((word) => words.includes(word));
+  const hasCorrectLenght = wordsArray.length === wordsNum.value;
+
+  invalidSeedShare.value = !isValid || !hasCorrectLenght;
+
+  if (!isValid) {
+    toast.add({
+      severity: "warn",
+      summary: "Invalid word",
+      detail: "The seed has some unvalid words",
+      life: 3000,
+    });
+  } else if (!hasCorrectLenght) {
+    toast.add({
+      severity: "warn",
+      summary: "Incorrect length",
+      detail: `The seed should have ${wordsNum.value} words`,
+      life: 3000,
+    });
+  }
+};
+
+const isValidShares = computed(() => {
+  const validNumbers =
+    recoverShares.value.map((d) => d.number).length ===
+    Array.from(new Set(recoverShares.value.map((d) => d.number))).length;
+  const validWords = recoverShares.value.every((share, _, shares) => {
+    const isFilled = share.value;
+    const wordsArray = share.value.split(" ");
+    const isValid = wordsArray.every((word) => words.includes(word));
+    const hasSameLength = shares.every(
+      (s) => s.value.split(" ").length === wordsArray.length
+    );
+
+    return isFilled && isValid && hasSameLength;
+  });
+
+  return validNumbers && validWords;
+});
+
 const recoverSeed = () => {
-  const lala = recoverShares.value.reduce<Record<string, string>>(
-    (acc, val, idx) => {
-      acc[(1 + idx).toString()] = val;
+  const isValidShares = recoverShares.value.every((d) => d.value);
+  if (!isValidShares) return;
+
+  const formattedShares = recoverShares.value.reduce<Record<string, string>>(
+    (acc, val) => {
+      acc[val.number] = val.value;
       return acc;
     },
     {}
   );
-  recoveredSeed.value = recoverMnemonic(lala);
+  try {
+    recoveredSeed.value = recoverMnemonic(formattedShares);
+  } catch (error) {
+    toast.add({
+      severity: "warn",
+      summary: "Invalid mnemonic",
+      detail: `That combination is not correct, please check the shares`,
+      life: 3000,
+    });
+  }
 };
 </script>
 
@@ -249,7 +385,9 @@ const recoverSeed = () => {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
   justify-items: center;
-  gap: 1rem;
+  column-gap: 1rem;
+  row-gap: 5px;
+  margin-top: 1rem;
 
   &__block {
     display: flex;
@@ -260,7 +398,7 @@ const recoverSeed = () => {
 
 .seed-box {
   width: 100%;
-  height: 100px;
+  height: 100px !important;
 }
 
 .title {
@@ -270,16 +408,62 @@ const recoverSeed = () => {
 
 .shares-wrapper {
   counter-reset: share-counter;
+
   &__share {
-    padding-left: 1rem;
+    padding-left: 1.2rem;
     position: relative;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 20px;
+    border: 1px solid black;
+    padding: 10px 30px;
+    border-radius: 10px;
+    transition: all 0.2s;
+    background-color: var(--surface-0);
 
     &:before {
       counter-increment: share-counter;
       content: counter(share-counter) ".";
       position: absolute;
-      left: 0;
+      left: 10px;
     }
+
+    &:hover {
+      background-color: var(--surface-50);
+    }
+
+    &__icon {
+      cursor: pointer;
+    }
+  }
+}
+
+.share-wrapper {
+  display: flex;
+  gap: 4px;
+  align-items: flex-start;
+}
+
+.share-option {
+  max-width: 70vw;
+  margin: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.recoveredSeed {
+  padding: 10px 20px;
+  border: 1px solid black;
+  padding: 10px 30px;
+  border-radius: 10px;
+  transition: all 0.2s;
+  background-color: var(--surface-0);
+  margin-top: 0.5rem;
+
+  &:hover {
+    background-color: var(--surface-50);
   }
 }
 </style>
