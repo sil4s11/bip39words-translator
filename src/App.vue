@@ -246,6 +246,7 @@ const generateShares = () => {
     );
     shares.value = Object.values(newShares).map((val) => val);
   } catch (error) {
+    console.log(error);
     toast.add({
       severity: "warn",
       summary: "Invalid mnemonic",
