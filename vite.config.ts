@@ -68,7 +68,7 @@ export default defineConfig({
       "@": fileURLToPath(new URL("./src", import.meta.url)),
       buffer: "rollup-plugin-node-polyfills/polyfills/buffer-es6",
       process: "rollup-plugin-node-polyfills/polyfills/process-es6",
-      stream: "rollup-plugin-node-polyfills/polyfills/stream-es6",
+      stream: "rollup-plugin-node-polyfills/polyfills/stream",
     },
   },
 });
