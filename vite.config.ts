@@ -66,8 +66,9 @@ export default defineConfig({
   resolve: {
     alias: {
       "@": fileURLToPath(new URL("./src", import.meta.url)),
-      buffer: 'rollup-plugin-node-polyfills/polyfills/buffer-es6',
-      process: 'rollup-plugin-node-polyfills/polyfills/process-es6',
+      buffer: "rollup-plugin-node-polyfills/polyfills/buffer-es6",
+      process: "rollup-plugin-node-polyfills/polyfills/process-es6",
+      transform: "rollup-plugin-node-polyfills/polyfills/transform-es6",
     },
   },
 });
