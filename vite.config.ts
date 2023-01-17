@@ -10,7 +10,11 @@ export default defineConfig({
   base: "",
   plugins: [
     vue(),
-    NgmiPolyfill(),
+    NgmiPolyfill({
+      rollupPolyfillOptions: {
+        crypto: true,
+      },
+    }),
     VitePWA({
       manifest: {
         name: "BIP39 Word Translator",
