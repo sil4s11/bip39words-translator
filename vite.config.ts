@@ -61,7 +61,7 @@ export default defineConfig({
           {
             src: "./assets/icons/512.webp",
             sizes: "512x512",
-            type: "image/png",
+            type: "image/webp",
           },
         ],
       },
