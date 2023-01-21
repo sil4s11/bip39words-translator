@@ -26,37 +26,37 @@ export default defineConfig({
           {
             src: "./assets/icons/72.webp",
             sizes: "72x72",
-            type: "image/png",
+            type: "image/webp",
           },
           {
             src: "./assets/icons/96.webp",
             sizes: "96x96",
-            type: "image/png",
+            type: "image/webp",
           },
           {
             src: "./assets/icons/128.webp",
             sizes: "128x128",
-            type: "image/png",
+            type: "image/webp",
           },
           {
             src: "./assets/icons/144.webp",
             sizes: "144x144",
-            type: "image/png",
+            type: "image/webp",
           },
           {
             src: "./assets/icons/152.webp",
             sizes: "152x152",
-            type: "image/png",
+            type: "image/webp",
           },
           {
             src: "./assets/icons/192.webp",
             sizes: "192x192",
-            type: "image/png",
+            type: "image/webp",
           },
           {
             src: "./assets/icons/384.webp",
             sizes: "384x384",
-            type: "image/png",
+            type: "image/webp",
           },
           {
             src: "./assets/icons/512.webp",
