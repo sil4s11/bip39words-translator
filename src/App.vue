@@ -1,6 +1,6 @@
 <template>
   <header>
-    <h1 class="header">BIP39 Word finder</h1>
+    <h1 class="header">BIP39 Utils</h1>
   </header>
   <main>
     <TabView v-model:activeIndex="activeTab">
