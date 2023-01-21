@@ -17,8 +17,8 @@ export default defineConfig({
     }),
     VitePWA({
       manifest: {
-        name: "BIP39 Word Translator",
-        short_name: "BIP39 Word Translator",
+        name: "BIP39 Utils",
+        short_name: "BIP39 Utils",
         display: "standalone",
         scope: "./",
         start_url: "./",
