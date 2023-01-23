@@ -187,6 +187,15 @@
     </TabView>
     <PrimeToast position="bottom-right" />
   </main>
+  <footer class="footer-wrapper">
+    <a
+      href="https://github.com/sil4s11/bip39words-translator"
+      target="_blank"
+      class="footer-wrapper__icon"
+    >
+      <i class="pi pi-github"></i>
+    </a>
+  </footer>
 </template>
 
 <script setup lang="ts">

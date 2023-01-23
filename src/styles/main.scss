@@ -15,22 +15,46 @@ body {
   -moz-osx-font-smoothing: grayscale;
   color: white;
   background-color: var(--bg-color);
+  margin: 0;
+}
+
+.footer-wrapper {
+  display: flex;
+  justify-content: flex-end;
+  position: fixed;
+  bottom: 0;
+  right: 0;
+  width: 100%;
+  padding: 12px;
+
+  &__icon {
+    color: white;
+
+    .pi {
+      font-size: 1.5rem;
+    }
+  }
 }
 
 #app {
   max-width: 1280px;
+  min-height: 100vh;
   margin: 0 auto;
   padding: 2rem;
   font-weight: normal;
 
   @media (max-width: 520px) {
-    padding: 1rem;
+    padding: 0;
   }
 }
 
 .p-tabview-panels {
   background-color: var(--bg-color) !important;
   color: white !important;
+
+  @media (max-width: 520px) {
+    padding: 0;
+  }
 }
 
 .p-tabview {
